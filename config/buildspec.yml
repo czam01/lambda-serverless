@@ -3,9 +3,8 @@ phases:
   build:
     commands:
       - aws cloudformation package --template-file template.yml --s3-bucket ${S3_BUCKET} --output-template-file output.yaml
-
 artifacts:
-    files:
-      - '**/*'
-    discard-paths: no
-    base-directory: ./
+  type: zip
+  files:
+    - template.yml
+    - output.yaml
