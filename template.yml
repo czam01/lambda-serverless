@@ -32,3 +32,121 @@ Resources:
               Action:
                 - sts:AssumeRole
         Path: /
+
+    CodeBuildProject:
+        Type: AWS::CodeBuild::Project
+        Properties:
+          Name: !Sub ${AWS::StackName}-build
+          Description: !Sub ${AWS::StackName} Builder
+          ServiceRole: !ImportValue CodeBuildRole
+          EncryptionKey: !ImportValue PipelineCMKey
+          Cache:
+            Type: S3
+            Location: !ImportValue S3ArtifactsBucket
+          Artifacts:
+            Type: CODEPIPELINE
+            Name: !Sub ${AWS::StackName}-source
+          Environment:
+            Type: LINUX_CONTAINER
+            ComputeType: BUILD_GENERAL1_MEDIUM
+            Image: aws/codebuild/python:3.7.1
+            EnvironmentVariables:
+              - Name: KMS_KEY
+                Value: !ImportValue PipelineCMKey
+              - Name: S3_BUCKET
+                Value: !ImportValue S3ArtifactsBucket
+          Source:
+            Type: CODEPIPELINE
+            BuildSpec: "config/buildspec.yml"
+          TimeoutInMinutes: 10
+
+    Pipeline:
+        Type: "AWS::CodePipeline::Pipeline"
+        Properties:
+          Name: !Sub ${AWS::StackName}-${BranchRepo}
+          RestartExecutionOnUpdate: true
+          RoleArn: !ImportValue PipelineRole
+          ArtifactStore:
+            Location: !ImportValue S3ArtifactsBucket
+            Type: S3
+            EncryptionKey:
+              Id: !ImportValue PipelineCMKey
+              Type: KMS
+          Stages:
+            - Name: Source
+              Actions:
+                - Name: Source
+                  ActionTypeId:
+                    Category: Source
+                    Owner: ThirdParty
+                    Provider: GitHub
+                    Version: 1
+                  RunOrder: 1
+                  OutputArtifacts:
+                    - Name: source
+                  Configuration:
+                    Owner: czam01
+                    PollForSourceChanges: false
+                    OAuthToken: "{{resolve:secretsmanager:CISecret:SecretString:GitHubToken}}"
+                    Repo: !Ref GithubProjectName
+                    Branch: master
+            - Name: Build
+              Actions:
+                - Name: Build
+                  ActionTypeId:
+                    Category: Build
+                    Owner: AWS
+                    Provider: CodeBuild
+                    Version: 1
+                  RunOrder: 1
+                  InputArtifacts:
+                    - Name: source
+                  OutputArtifacts:
+                    - Name: template    
+                  Configuration:
+                    ProjectName: !Ref CodeBuildProject
+            - Name: Production
+              Actions:
+                - Name: CreateChangeSet
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Provider: CloudFormation
+                    Version: "1"
+                  InputArtifacts:
+                    - Name: template
+                  Configuration:
+                    ActionMode: CHANGE_SET_REPLACE
+                    Capabilities: CAPABILITY_NAMED_IAM
+                    RoleArn: !ImportValue PipelineRole 
+                    StackName: !Sub ${AWS::StackName}
+                    ChangeSetName: !Sub ${AWS::StackName}-ChangeSet
+                    TemplatePath: !Sub "template::output.yaml"
+                  RunOrder: 1
+                - Name: ExecuteChangeSet
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Provider: CloudFormation
+                    Version: 1
+                  Configuration:
+                    ActionMode: CHANGE_SET_EXECUTE
+                    RoleArn: !ImportValue PipelineRole 
+                    StackName: !Sub ${AWS::StackName}
+                    ChangeSetName: !Sub ${AWS::StackName}-ChangeSet
+                  RunOrder: 2
+
+    Webhook:
+        Type: "AWS::CodePipeline::Webhook"
+        Properties:
+          AuthenticationConfiguration:
+            SecretToken: "{{resolve:secretsmanager:CISecret:SecretString:GitHubToken}}"
+          Filters:
+            - JsonPath: "$.ref"
+              MatchEquals: refs/heads/{Branch}
+          Authentication: GITHUB_HMAC
+          TargetPipeline: !Ref Pipeline
+          TargetAction: Source
+          Name: !Sub ${AWS::StackName}-pipeline-webhook
+          TargetPipelineVersion: 1
+          RegisterWithThirdParty: "true"
