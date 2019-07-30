@@ -2,7 +2,8 @@ version: 0.2
 phases:
   build:
     commands:
-      - ls
+      - aws cloudformation package --template-file template.yml --s3-bucket ${S3_BUCKET} --output-template-file output.yaml
+
 artifacts:
     files:
       - '**/*'
