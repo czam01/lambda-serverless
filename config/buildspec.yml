@@ -3,3 +3,8 @@ phases:
   build:
     commands:
       - ls
+artifacts:
+    files:
+      - '**/*'
+    discard-paths: no
+    base-directory: ./
