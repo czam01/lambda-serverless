@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Resources:
+    LambdaFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        FunctionName: VotaNet
+        Handler: lambda_function.lambda_handler
+        Runtime: python3.7
+        MemorySize: 512
+        Timeout: 600
+        Role: !GetAtt LambdaRole.Arn
+        Environment:
+            Variables:
+                dynamotable: platzi_bd
+
+    EventSourceMappingConsumer:
+        Type: "AWS::Lambda::EventSourceMapping"
+        Properties:
+            EventSourceArn:
+                !ImportValue SQSSegmentARN
+            FunctionName:
+                !Ref LambdaFunction
+            Enabled: True
+
+    LambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        ManagedPolicyArns:
+          - !ImportValue LambdaPolicyEC2
+        AssumeRolePolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            -
+              Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
+        Path: /
+
+Outputs:
+    LambdaFunctionArn:
+        Value: !GetAtt LambdaFunction.Arn
+        Export:
+            Name: LambdaFunctionArn
+    LambdaRole:
+        Value: !GetAtt LambdaRole.Arn
+        Export:
+            Name: LambdaRole

@@ -1,0 +1,10 @@
+version: 0.2
+phases:
+  build:
+    commands:
+      - aws cloudformation package --template-file template.yml --kms-key-id ${KMS_KEY} --s3-bucket ${S3_BUCKET} --output-template-file output.yaml
+artifacts:
+  type: zip
+  files:
+    - template.yml
+    - output.yaml
