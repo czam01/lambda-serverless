@@ -1,34 +1,105 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
 
 Resources:
     LambdaFunction:
       Type: AWS::Serverless::Function
       Properties:
-        FunctionName: VotaNet
+        FunctionName: !Ref LambdaName
         Handler: lambda_function.lambda_handler
-        Runtime: python3.7
+        Runtime: !Ref LambdaRuntime
         MemorySize: 512
         Timeout: 600
         Role: !GetAtt LambdaRole.Arn
         Environment:
             Variables:
-                dynamotable: platzi_bd
+                DYNAMO_PLATZI: !ImportValue DynamoPlatzi
 
-    EventSourceMappingConsumer:
-        Type: "AWS::Lambda::EventSourceMapping"
+    LambdaPolicyEC2:
+        Type: AWS::IAM::ManagedPolicy
         Properties:
-            EventSourceArn:
-                !ImportValue SQSSegmentARN
-            FunctionName:
-                !Ref LambdaFunction
-            Enabled: True
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    -
+                      Effect: Allow
+                      Action:
+                          - ec2:DisassociateAddress
+                          - ec2:CreateDhcpOptions
+                          - ec2:ReplaceRouteTableAssociation
+                          - ec2:RunScheduledInstances
+                          - ec2:RequestSpotFleet
+                          - ec2:DisableVgwRoutePropagation
+                          - ec2:AssociateVpcCidrBlock
+                          - ec2:ReleaseHosts
+                          - ec2:ReplaceRoute
+                          - ec2:DisassociateVpcCidrBlock
+                          - ec2:DeleteNetworkInterfacePermission
+                          - ec2:DescribeNetworkInterfaces
+                          - ec2:StartInstances
+                          - ec2:DescribeNetworkInterfaceAttribute
+                          - ec2:CreateRoute
+                          - ec2:ReplaceNetworkAclEntry
+                          - ec2:CreateSecurityGroup
+                          - ec2:CreateNetworkAcl
+                          - ec2:DescribeNetworkInterfacePermissions
+                          - ec2:TerminateInstances
+                          - ec2:AcceptVpcEndpointConnections
+                          - ec2:DeleteNetworkInterface
+                          - ec2:CreateRouteTable
+                          - ec2:RunInstances
+                          - ec2:StopInstances
+                          - ec2:DisassociateRouteTable
+                          - ec2:DisassociateSubnetCidrBlock
+                          - ec2:ModifyHosts
+                          - ec2:ReplaceNetworkAclAssociation
+                          - ec2:CreateVolume
+                          - ec2:CreateNetworkInterface
+                          - ec2:DetachVpnGateway
+                          - ec2:CreateDefaultVpc
+                          - ec2:DisassociateIamInstanceProfile
+                          - ec2:CreateVpcEndpoint
+                          - ec2:DisableVpcClassicLink
+                          - ec2:CreateSubnet
+                      Resource:
+                          - "*"
+    LambdaPolicyDynamo:
+        Type: AWS::IAM::ManagedPolicy
+        Properties:
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    -
+                      Effect: Allow
+                      Action:
+                          - dynamodb:PutItem
+                          - dynamodb:UpdateItem
+                          - dynamodb:GetItem
+                          - dynamodb:*
+                      Resource:
+                          - "*"
+
+    LambdaPolicyCW:
+        Type: AWS::IAM::ManagedPolicy
+        Properties:
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    -
+                      Effect: Allow
+                      Action:
+                          - logs:*
+                          - cloudwatch:*
+                          - xray:*
+                      Resource:
+                          - "*"
 
     LambdaRole:
       Type: AWS::IAM::Role
       Properties:
         ManagedPolicyArns:
-          - !ImportValue LambdaPolicyEC2
+          - !Ref LambdaPolicyDynamo
+          - !Ref LambdaPolicyEC2
+          - !Ref LambdaPolicyCW
         AssumeRolePolicyDocument:
           Version: 2012-10-17
           Statement:
@@ -40,13 +111,23 @@ Resources:
               Action:
                 - sts:AssumeRole
         Path: /
-
-Outputs:
-    LambdaFunctionArn:
-        Value: !GetAtt LambdaFunction.Arn
-        Export:
-            Name: LambdaFunctionArn
-    LambdaRole:
-        Value: !GetAtt LambdaRole.Arn
-        Export:
-            Name: LambdaRole
+    LambdaPolicyS3:
+        Type: AWS::IAM::ManagedPolicy
+        Properties:
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    -
+                      Effect: Allow
+                      Action:
+                          - s3:ListAllMyBuckets
+                          - s3:HeadBucket
+                          - s3:ListObjects
+                      Resource:
+                          - "*"
+                    -
+                      Effect: Allow
+                      Action:
+                          - s3:*
+                      Resource:
+                          - "*"      
