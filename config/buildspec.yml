@@ -6,5 +6,5 @@ phases:
 artifacts:
   type: zip
   files:
-    - template.yml
-    - output.yaml
+    - template.yaml
+    - outputtemplate.yaml
