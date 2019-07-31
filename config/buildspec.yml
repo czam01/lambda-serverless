@@ -5,7 +5,7 @@ phases:
         python: 3.7
   build:
     commands:
-      - aws cloudformation package --template-file template.yml --s3-bucket ${S3_BUCKET} --output-template-file outputtemplate.yaml
+      - aws cloudformation package --template-file template.yaml --s3-bucket ${S3_BUCKET} --output-template-file outputtemplate.yaml
 artifacts:
   type: zip
   files:
