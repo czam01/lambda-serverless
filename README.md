@@ -41,18 +41,21 @@ Ahora debemos desplegar el pipeline que tendrá la función de automatizar el de
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i5.png)
 2.6  Setear como variable de entorno el bucket creado en pre-requisitos.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i6.png)
-2.7  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+2.7  Especificar la ruta del buildspec que estara en la carpeta config del repo.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i7.png)
-2.8  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+2.8  Agregar las capabilities especificadas.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i8.png)
-2.9  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+2.9  Configurar la siguiente acción de deploy: Create or update change set.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i9.png)
-2.10  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+2.10  Guardar y posteriormente en el pipeline editar la fase.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i10.png)
-2.11  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+2.11  Agregar una tarea despues del deploy.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i11.png)
-2.12  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+2.12  La tarea debe ser de tipo execute change set quien desplegará el cambio en la lambda.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i12.png)
+
+De ahora en adelante el pipe se ejecutará cuando el repositorio en su rama master reciba un push que disparará el webhook.
+
 
 
 
