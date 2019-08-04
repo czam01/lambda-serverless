@@ -24,5 +24,11 @@ Recuerden los parámetros de este template como Nombre y Key de la tabla, adicio
 ### Pipeline y Lambda
 Ahora debemos desplegar el pipeline que tendrá la función de automatizar el despliegue de nuestra serverless function.
 
+1.  **Estructura del Repo:** Se debe dejar la estructura del repo con template.yml en la raiz y el código de la lambda igualmente, ver --> https://github.com/czam01/lambda-serverless
+
+2.  **Creación manual del Pipeline:** Se debe crear el pipeline dentro de codepipeline siguiendo los siguientes pasos:
+
+
+
 
 
