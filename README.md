@@ -47,7 +47,7 @@ Ahora debemos desplegar el pipeline que tendrá la función de automatizar el de
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i8.png)
 2.9  Configurar la siguiente acción de deploy: Create or update change set.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i9.png)
-2.10  Guardar y posteriormente en el pipeline editar la fase.
+2.10.  Guardar y posteriormente en el pipeline editar la fase.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i10.png)
 2.11  Agregar una tarea despues del deploy.
 ![](https://github.com/czam01/lambda-payu/blob/master/images/i11.png)
