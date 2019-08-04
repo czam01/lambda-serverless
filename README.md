@@ -28,6 +28,35 @@ Ahora debemos desplegar el pipeline que tendrá la función de automatizar el de
 
 2.  **Creación manual del Pipeline:** Se debe crear el pipeline dentro de codepipeline siguiendo los siguientes pasos:
 
+2.1  Crear el pipeline y seleccionar el role creado en los pre-requisitos.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i1.png)
+
+2.2  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i2.png)
+2.3  Agregar  codebuild como fase.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i3.png)
+2.4  Crear proyecto de Codebuild.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i4.png)
+2.5  Seleccionar la imagen del contenedor que se ejecutará en el Codebuild y también el role de codebuild creado en los pre-requisitos atenriormente.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i5.png)
+2.6  Setear como variable de entorno el bucket creado en pre-requisitos.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i6.png)
+2.7  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i7.png)
+2.8  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i8.png)
+2.9  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i9.png)
+2.10  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i10.png)
+2.11  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i11.png)
+2.12  Agregar como source el repositorio en Github y autorizar la aplicación. Seleccionar el repo y la branch.
+![](https://github.com/czam01/lambda-payu/blob/master/images/i12.png)
+
+
+
+
 
 
 
