@@ -56,11 +56,33 @@ Ahora debemos desplegar el pipeline que tendrá la función de automatizar el de
 
 De ahora en adelante el pipe se ejecutará cuando el repositorio en su rama master reciba un push que disparará el webhook.
 
+### Api Gateway
+
+*  **Despliegue API GW:** Se debe desplegar el template --> https://github.com/czam01/cloudformation/blob/master/api-proyecto/api.yml e ingresarle como parametro el ARN de la función lambda creada.
+
+Así se desplegará un api gateway completo como trigger de la función lambda.
+
+*  **Deploy API:** En la consola de apigateway se debe seleccionar el Api --> Acciones --> Deploy API.
 
 
+### Probar el Proyecto
 
+1.  Se debe desde un programa llamado postman hacer el request al endpoint del API.
+2.  En el request en el campo BODY se debe seleccionar RAW y se le manda el JSON de la siguiente forma:
 
+{
+  "cc":"NUMERO DE LA CEDULA"
+}
 
+Y la respuesta será algo como lo siguiente:
+
+{
+  "nombre": "Pedro",
+  "apellido": "Gomez",
+  "cc": "CEDULA",
+  "direccion": "Cra 1 1-1",
+  "puesto": "mesa 50"  
+}
 
 
 
