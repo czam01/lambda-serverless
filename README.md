@@ -84,5 +84,9 @@ Y la respuesta será algo como lo siguiente:
   "puesto": "mesa 50"  
 }
 
+Se puede tambien probar por bash con el comando
+curl -X POST API --data '{"cc":"CEDULA"}' 
+
+
 
 
