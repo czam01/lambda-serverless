@@ -4,7 +4,6 @@ from boto3.dynamodb.conditions import Key
 
 DYNAMO_PLATZI = os.environ['DYNAMO_PLATZI']
 
-// hola mama
 
 class DynamoAccessor:
     def __init__(self, dynamo_table):
