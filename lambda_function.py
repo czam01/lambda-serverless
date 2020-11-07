@@ -2,7 +2,7 @@ import boto3
 import os
 from boto3.dynamodb.conditions import Key
 
-DYNAMO_PLATZI = os.environ['DYNAMO_BD']
+DYNAMO_BD = os.environ['DYNAMO_BD']
 
 
 class DynamoAccessor:
