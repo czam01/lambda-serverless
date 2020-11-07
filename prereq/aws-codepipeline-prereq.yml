@@ -163,6 +163,7 @@ Resources:
                   - lambda:InvokeFunction
                   - lambda:ListFunctions
                   - s3:*
+                  - iam:PassRole
                 Resource: "*"
               - Effect: Allow
                 Action:
