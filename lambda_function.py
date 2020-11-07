@@ -2,8 +2,9 @@ import boto3
 import os
 from boto3.dynamodb.conditions import Key
 
-DYNAMO_BD = os.environ['DYNAMO_BD']
+# Hola a todos companeros estoy editando el codigo porque soy developer 
 
+DYNAMO_BD = os.environ['DYNAMO_BD']
 
 class DynamoAccessor:
     def __init__(self, dynamo_table):
