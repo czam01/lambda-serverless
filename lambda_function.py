@@ -2,7 +2,7 @@ import boto3
 import os
 from boto3.dynamodb.conditions import Key
 
-DYNAMO_PLATZI = os.environ['DYNAMO_PLATZI']
+DYNAMO_PLATZI = os.environ['DYNAMO_BD']
 
 
 class DynamoAccessor:
@@ -10,12 +10,12 @@ class DynamoAccessor:
         dynamo_db = boto3.resource('dynamodb')
         self.table = dynamo_db.Table(dynamo_table)
 
-    def get_data_from_dynamo(self, cc):
-        response = self.table.query(KeyConditionExpression=Key('cc').eq(cc))
+    def get_data_from_dynamo(self, dni):
+        response = self.table.query(KeyConditionExpression=Key('dni').eq(dni))
         return response["Items"][0] if any(response["Items"]) else None
 
 def lambda_handler(event, context):
-    dynamo_backend = DynamoAccessor(DYNAMO_PLATZI)
-    db_element = dynamo_backend.get_data_from_dynamo(event['cc'])
+    dynamo_backend = DynamoAccessor(DYNAMO_BD)
+    db_element = dynamo_backend.get_data_from_dynamo(event['dni'])
     return db_element
 
