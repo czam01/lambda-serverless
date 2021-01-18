@@ -1,5 +1,3 @@
-# Proyecto Platzi
-
 ## Despliegue del proyeto
 
 ### Pre-Requisitos
