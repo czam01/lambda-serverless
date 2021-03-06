@@ -2,7 +2,7 @@ import boto3
 import os
 from boto3.dynamodb.conditions import Key
 
-# Hola a todos companeros 
+# Hola a todos companeros, saludos a roberto, miguel, camilo, luisf, reinaldo, juan. jacobo, carlos, jeison, jhonatan
 
 DYNAMO_BD = os.environ['DYNAMO_BD']
 
