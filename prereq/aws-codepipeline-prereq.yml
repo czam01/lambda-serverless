@@ -179,6 +179,38 @@ Resources:
                   - kms:Decrypt
                 Resource:
                   - !GetAtt KMSKey.Arn
+                  
+  CloudFormationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: cloudformation-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:AttachRolePolicy
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:DetachRolePolicy 
+                  - iam:GetRole
+                  - iam:PassRole
+                  - cloudformation:*
+                  - lambda:CreateFunction
+                  - lambda:DeleteFunction
+                  - lambda:GetFunction
+                  - s3:*
+                Resource: "*"
 
   LambdaPolicyEC2:
       Type: AWS::IAM::ManagedPolicy
