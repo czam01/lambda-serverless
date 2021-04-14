@@ -6,7 +6,7 @@ Parameters:
         Type: String
       
 Resources:
-  DynamoLab:
+  DynamoPlatzi:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: !Ref DynamoName
