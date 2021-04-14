@@ -12,7 +12,7 @@ Resources:
         Role: !GetAtt LambdaRole.Arn
         Environment:
             Variables:
-                DYNAMO_BD: !ImportValue DynamoLab 
+                DYNAMO_BD: !ImportValue DynamoPlatzi 
     LambdaRole:
       Type: AWS::IAM::Role
       Properties:
