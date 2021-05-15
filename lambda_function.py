@@ -2,9 +2,9 @@ import boto3
 import os
 from boto3.dynamodb.conditions import Key
 
-# Hola a todos companeros, Carlos es el mejor profe de AWS del Mundo
-
 DYNAMO_BD = os.environ['DYNAMO_BD']
+
+# Lore, aleja, walter, andres, geny, juand, juan, hernan, lucy, julian y toooooodos
 
 class DynamoAccessor:
     def __init__(self, dynamo_table):
