@@ -4,7 +4,8 @@ from boto3.dynamodb.conditions import Key
 
 DYNAMO_BD = os.environ['DYNAMO_BD']
 
-# Hola amigos de Uniandes, los quiero mucho
+# Hola querido Richard sé que amas Azure
+
 
 class DynamoAccessor:
     def __init__(self, dynamo_table):
