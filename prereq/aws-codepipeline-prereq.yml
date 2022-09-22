@@ -1,33 +1,33 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Codepipeline pre requisites
 
-Resources:
+Resources: 
   S3ArtifactsBucket:
-    Type: AWS::S3::Bucket
+    Type: AWS::S3::Bucket #Create the bucket
     Properties:
-      BucketName: !Sub codepipeline-artefactos-${AWS::AccountId}-${AWS::Region}
+      BucketName: !Sub codepipeline-artefactos-${AWS::AccountId}-${AWS::Region} #Set the name of the bucket 
 
-  S3ArtifactsBucketPolicy:
-    Type: AWS::S3::BucketPolicy
+  S3ArtifactsBucketPolicy: 
+    Type: AWS::S3::BucketPolicy # Create the bucket's policy
     Properties:
-      Bucket: !Ref S3ArtifactsBucket
-      PolicyDocument:
+      Bucket: !Ref S3ArtifactsBucket # Define which one is the bucket
+      PolicyDocument: # Set the policy document of the bucket
         Version: "2012-10-17"
         Id: SSEAndSSLPolicy
         Statement:
           - Sid: ""
             Effect: Allow
-            Principal:
+            Principal: #Who's going to enter to the bucket?
               AWS:
-                - !GetAtt CodeBuildRole.Arn
+                - !GetAtt CodeBuildRole.Arn #Create and Return the ARN (Amazon Resource Name) of that role
                 - !GetAtt CodePipelineRole.Arn
-            Action:
+            Action: # Define the actions that the roles are able to do
               - s3:Get*
               - s3:Put*
-            Resource: !Sub "arn:aws:s3:::${S3ArtifactsBucket}/*"
+            Resource: !Sub "arn:aws:s3:::${S3ArtifactsBucket}/*" # in thise bucket and all his sub folders(*) the roles are going to act
 
   CodeBuildRole:
-    Type: AWS::IAM::Role
+    Type: AWS::IAM::Role #Create an IAM role for CodeBuild
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -77,7 +77,7 @@ Resources:
                   - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
 
   CodePipelineRole:
-    Type: AWS::IAM::Role
+    Type: AWS::IAM::Role # Rol para CodePipeline
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -119,11 +119,11 @@ Resources:
                   - lambda:ListFunctions
                   - s3:*
                   - iam:PassRole
-                  - cloudformation:DescribeStacks
+                  - cloudformation:*
                 Resource: "*"
 
   LambdaPolicyEC2:
-      Type: AWS::IAM::ManagedPolicy
+      Type: AWS::IAM::ManagedPolicy #Managed policy for the lambda on EC2
       Properties:
           PolicyDocument:
               Version: 2012-10-17
@@ -170,7 +170,7 @@ Resources:
                         - ec2:CreateSubnet
                     Resource:
                         - "*"
-  LambdaPolicyDynamo:
+  LambdaPolicyDynamo: #Managed policy for the lambda on DynamoDB
       Type: AWS::IAM::ManagedPolicy
       Properties:
           PolicyDocument:
@@ -186,7 +186,7 @@ Resources:
                     Resource:
                         - "*"
 
-  LambdaPolicyCW:
+  LambdaPolicyCW: #Managed policy for the lambda on cloudwatch
       Type: AWS::IAM::ManagedPolicy
       Properties:
           PolicyDocument:
@@ -202,10 +202,10 @@ Resources:
                         - "*"
 
   LambdaRole:
-    Type: AWS::IAM::Role
+    Type: AWS::IAM::Role #Create role for the lambda
     Properties:
       ManagedPolicyArns:
-        - !Ref LambdaPolicyDynamo
+        - !Ref LambdaPolicyDynamo #Attach the managed policies to the lambda so it can acto on these services
         - !Ref LambdaPolicyEC2
         - !Ref LambdaPolicyCW
       AssumeRolePolicyDocument:
