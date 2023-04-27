@@ -2,7 +2,7 @@ import boto3
 import os
 from boto3.dynamodb.conditions import Key
 
-# Hola a todos, hoy es 16 de marzo, el profe cumple anos el 29 de marzo
+# Pedro Leon, Bibiana, Julian Acevedo, dejen el Bullying
 
 DYNAMO_BD = os.environ['DYNAMO_BD']
 
@@ -11,12 +11,12 @@ class DynamoAccessor:
         dynamo_db = boto3.resource('dynamodb')
         self.table = dynamo_db.Table(dynamo_table)
 
-    def get_data_from_dynamo(self, cc):
-        response = self.table.query(KeyConditionExpression=Key('cc').eq(cc))
+    def get_data_from_dynamo(self, dni):
+        response = self.table.query(KeyConditionExpression=Key('dni').eq(dni))
         return response["Items"][0] if any(response["Items"]) else None
 
 def lambda_handler(event, context):
     dynamo_backend = DynamoAccessor(DYNAMO_BD)
-    db_element = dynamo_backend.get_data_from_dynamo(event['cc'])
+    db_element = dynamo_backend.get_data_from_dynamo(event['dni'])
     return db_element
 
