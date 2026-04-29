@@ -63,6 +63,8 @@ Resources:
                 Resource:
                   - !Sub 'arn:aws:s3:::${S3ArtifactsBucket}'
                   - !Sub 'arn:aws:s3:::${S3ArtifactsBucket}/*'
+                  - 'arn:aws:s3:::codepipeline-*'
+                  - 'arn:aws:s3:::codepipeline-*/*'
               - Effect: Allow
                 Action:
                   - cloudformation:DescribeStacks
@@ -91,9 +93,12 @@ Resources:
                   - s3:GetObject
                   - s3:PutObject
                   - s3:GetBucketVersioning
+                  - s3:GetObjectVersion
                 Resource:
                   - !Sub 'arn:aws:s3:::${S3ArtifactsBucket}'
                   - !Sub 'arn:aws:s3:::${S3ArtifactsBucket}/*'
+                  - 'arn:aws:s3:::codepipeline-*'
+                  - 'arn:aws:s3:::codepipeline-*/*'
               - Effect: Allow
                 Action:
                   - codebuild:BatchGetBuilds
