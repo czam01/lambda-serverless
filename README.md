@@ -316,11 +316,23 @@ NOTA: La conexion queda en estado Available. Copia el ARN de la conexion.
    - Revisar toda la configuracion
    - Click en Create pipeline
 
-### 3.4 Agregar accion de Execute Change Set
+### 3.4 Nota sobre Change Sets en ambientes productivos
 
-El pipeline se crea pero solo genera el Change Set sin ejecutarlo. Hay que agregar la accion de ejecucion:
+En un ambiente productivo real, el Change Set actua como una medida de revision y control
+antes de aplicar cambios a la infraestructura. El flujo recomendado es:
 
-1. En el pipeline recien creado, click en Edit
+1. El pipeline crea el Change Set automaticamente
+2. Un ingeniero revisa los cambios propuestos en la consola de CloudFormation
+3. Una vez validado, se aprueba y ejecuta el Change Set manualmente
+
+Esto permite detectar cambios no deseados (eliminacion de recursos, modificaciones de
+permisos, etc.) antes de que se apliquen.
+
+Sin embargo, para ambientes de desarrollo o laboratorios como este, se puede agregar
+una accion adicional en el pipeline para ejecutar el Change Set automaticamente,
+eliminando la necesidad de aprobacion manual:
+
+1. En el pipeline, click en Edit
 2. En el stage Deploy, click en Edit stage
 3. Click en + Add action group (debajo de la accion existente)
 4. Configurar:
@@ -331,6 +343,8 @@ El pipeline se crea pero solo genera el Change Set sin ejecutarlo. Hay que agreg
    - Stack name: VotaNet-Lambda
    - Change set name: VotaNet-ChangeSet
 5. Click en Done, Save, Save
+
+Con esta configuracion, cada push a master despliega automaticamente sin intervencion manual.
 
 ### 3.5 Ejecutar el Pipeline
 
