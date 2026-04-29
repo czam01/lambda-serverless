@@ -1,246 +1,144 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: Codepipeline pre requisites
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VotaNet - Pre-requisitos de CodePipeline (bucket, roles, policies)
 
 Resources:
   S3ArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub codepipeline-artefactos-${AWS::AccountId}-${AWS::Region}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   S3ArtifactsBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref S3ArtifactsBucket
       PolicyDocument:
-        Version: "2012-10-17"
-        Id: SSEAndSSLPolicy
+        Version: '2012-10-17'
         Statement:
-          - Sid: ""
-            Effect: Allow
+          - Effect: Allow
             Principal:
               AWS:
                 - !GetAtt CodeBuildRole.Arn
                 - !GetAtt CodePipelineRole.Arn
             Action:
-              - s3:Get*
-              - s3:Put*
-            Resource: !Sub "arn:aws:s3:::${S3ArtifactsBucket}/*"
+              - s3:GetObject
+              - s3:PutObject
+            Resource: !Sub 'arn:aws:s3:::${S3ArtifactsBucket}/*'
 
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
-              Service:
-                - codebuild.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Path: "/service-role/"
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /service-role/
       Policies:
         - PolicyName: codebuild-policy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
-              - Effect: Allow
-                Action:
-                  - ecr:GetAuthorizationToken
-                  - ec2:CreateNetworkInterface
-                  - ec2:DescribeDhcpOptions
-                  - ec2:DescribeNetworkInterfaces
-                  - ec2:DeleteNetworkInterface
-                  - ec2:DescribeSubnets
-                  - ec2:DescribeSecurityGroups
-                  - ec2:DescribeVpcs
-                  - ec2:CreateNetworkInterfacePermission
-                  - lambda:*
-                  - cloudformation:Describe*
-                  - cloudformation:Get*
-                  - cloudformation:List*
-                  - cloudformation:ValidateTemplate
-                  - cloudformation:ExecuteChangeSet
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - s3:*
-                  - sqs:*
-                  - sns:*
-                Resource: "*"
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetBucketLocation
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+                  - !Sub 'arn:aws:s3:::${S3ArtifactsBucket}'
+                  - !Sub 'arn:aws:s3:::${S3ArtifactsBucket}/*'
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:GetTemplate
+                  - cloudformation:ValidateTemplate
+                Resource: '*'
 
   CodePipelineRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
-              Service:
-                - codepipeline.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Path: "/"
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
       Policies:
         - PolicyName: codepipeline-policy
           PolicyDocument:
-            Version: "2012-10-17"
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
-                  - s3:PutObject
                   - s3:GetObject
-                  - s3:GetObjectVersion
+                  - s3:PutObject
                   - s3:GetBucketVersioning
                 Resource:
-                  - !Sub "arn:aws:s3:::${S3ArtifactsBucket}/*"
+                  - !Sub 'arn:aws:s3:::${S3ArtifactsBucket}'
+                  - !Sub 'arn:aws:s3:::${S3ArtifactsBucket}/*'
               - Effect: Allow
                 Action:
                   - codebuild:BatchGetBuilds
-                  - codebuild:BatchGetProjects
-                  - codebuild:ListBuilds
-                  - codebuild:ListBuildsForProject
-                  - codebuild:ListConnectedOAuthAccounts
-                  - codebuild:ListProjects
-                  - codebuild:ListRepositories
                   - codebuild:StartBuild
-                  - codebuild:StopBuild
-                  - sns:Publish
-                  - cloudwatch:*
-                  - lambda:InvokeFunction
-                  - lambda:ListFunctions
-                  - s3:*
-                  - iam:PassRole
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
                   - cloudformation:DescribeStacks
-                Resource: "*"
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteChangeSet
+                  - cloudformation:DescribeChangeSet
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: '*'
 
-  LambdaPolicyEC2:
-      Type: AWS::IAM::ManagedPolicy
-      Properties:
-          PolicyDocument:
-              Version: 2012-10-17
-              Statement:
-                  -
-                    Effect: Allow
-                    Action:
-                        - ec2:DisassociateAddress
-                        - ec2:CreateDhcpOptions
-                        - ec2:ReplaceRouteTableAssociation
-                        - ec2:RunScheduledInstances
-                        - ec2:RequestSpotFleet
-                        - ec2:DisableVgwRoutePropagation
-                        - ec2:AssociateVpcCidrBlock
-                        - ec2:ReleaseHosts
-                        - ec2:ReplaceRoute
-                        - ec2:DisassociateVpcCidrBlock
-                        - ec2:DeleteNetworkInterfacePermission
-                        - ec2:DescribeNetworkInterfaces
-                        - ec2:StartInstances
-                        - ec2:DescribeNetworkInterfaceAttribute
-                        - ec2:CreateRoute
-                        - ec2:ReplaceNetworkAclEntry
-                        - ec2:CreateSecurityGroup
-                        - ec2:CreateNetworkAcl
-                        - ec2:DescribeNetworkInterfacePermissions
-                        - ec2:TerminateInstances
-                        - ec2:AcceptVpcEndpointConnections
-                        - ec2:DeleteNetworkInterface
-                        - ec2:CreateRouteTable
-                        - ec2:RunInstances
-                        - ec2:StopInstances
-                        - ec2:DisassociateRouteTable
-                        - ec2:DisassociateSubnetCidrBlock
-                        - ec2:ModifyHosts
-                        - ec2:ReplaceNetworkAclAssociation
-                        - ec2:CreateVolume
-                        - ec2:CreateNetworkInterface
-                        - ec2:DetachVpnGateway
-                        - ec2:CreateDefaultVpc
-                        - ec2:DisassociateIamInstanceProfile
-                        - ec2:CreateVpcEndpoint
-                        - ec2:DisableVpcClassicLink
-                        - ec2:CreateSubnet
-                    Resource:
-                        - "*"
   LambdaPolicyDynamo:
-      Type: AWS::IAM::ManagedPolicy
-      Properties:
-          PolicyDocument:
-              Version: 2012-10-17
-              Statement:
-                  -
-                    Effect: Allow
-                    Action:
-                        - dynamodb:PutItem
-                        - dynamodb:UpdateItem
-                        - dynamodb:GetItem
-                        - dynamodb:*
-                    Resource:
-                        - "*"
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:Query
+              - dynamodb:GetItem
+            Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/*'
 
   LambdaPolicyCW:
-      Type: AWS::IAM::ManagedPolicy
-      Properties:
-          PolicyDocument:
-              Version: 2012-10-17
-              Statement:
-                  -
-                    Effect: Allow
-                    Action:
-                        - logs:*
-                        - cloudwatch:*
-                        - xray:*
-                    Resource:
-                        - "*"
-
-  LambdaRole:
-    Type: AWS::IAM::Role
+    Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyArns:
-        - !Ref LambdaPolicyDynamo
-        - !Ref LambdaPolicyEC2
-        - !Ref LambdaPolicyCW
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
+      PolicyDocument:
+        Version: '2012-10-17'
         Statement:
-          -
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
+          - Effect: Allow
             Action:
-              - sts:AssumeRole
-      Path: /
-  LambdaPolicyS3:
-      Type: AWS::IAM::ManagedPolicy
-      Properties:
-          PolicyDocument:
-              Version: 2012-10-17
-              Statement:
-                  -
-                    Effect: Allow
-                    Action:
-                        - s3:ListAllMyBuckets
-                        - s3:HeadBucket
-                        - s3:ListObjects
-                    Resource:
-                        - "*"
-                  -
-                    Effect: Allow
-                    Action:
-                        - s3:*
-                    Resource:
-                        - "*" 
-
-
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
 
 Outputs:
   PipelineRole:
@@ -258,16 +156,8 @@ Outputs:
   LambdaPolicyDynamo:
     Value: !Ref LambdaPolicyDynamo
     Export:
-        Name: LambdaPolicyDynamo
-  LambdaPolicyEC2:
-    Value: !Ref LambdaPolicyEC2
-    Export:
-        Name: LambdaPolicyEC2
+      Name: LambdaPolicyDynamo
   LambdaPolicyCW:
     Value: !Ref LambdaPolicyCW
     Export:
-        Name: LambdaPolicyCW
-  LambdaPolicyS3:
-    Value: !Ref LambdaPolicyS3
-    Export:
-        Name: LambdaPolicyS3        
+      Name: LambdaPolicyCW

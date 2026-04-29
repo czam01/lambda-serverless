@@ -1,22 +1,45 @@
 import boto3
+import json
 import os
+import logging
 from boto3.dynamodb.conditions import Key
 
-# Hola a todos queridos uniandinos, alvaro, dario, desiree, felipe, juan, katerin, leo, rafa, seba, vale
+logger = logging.getLogger()
+logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 DYNAMO_BD = os.environ['DYNAMO_BD']
+DYNAMO_KEY = os.environ.get('DYNAMO_KEY', 'cc')
 
-class DynamoAccessor:
-    def __init__(self, dynamo_table):
-        dynamo_db = boto3.resource('dynamodb')
-        self.table = dynamo_db.Table(dynamo_table)
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table(DYNAMO_BD)
 
-    def get_data_from_dynamo(self, cc):
-        response = self.table.query(KeyConditionExpression=Key('cc').eq(cc))
-        return response["Items"][0] if any(response["Items"]) else None
 
 def lambda_handler(event, context):
-    dynamo_backend = DynamoAccessor(DYNAMO_BD)
-    db_element = dynamo_backend.get_data_from_dynamo(event['cc'])
-    return db_element
+    try:
+        body = event if isinstance(event, dict) and DYNAMO_KEY in event else json.loads(event.get('body', '{}'))
+        cc = body.get(DYNAMO_KEY)
 
+        if not cc:
+            return response(400, {'error': f'Campo "{DYNAMO_KEY}" es requerido'})
+
+        result = table.query(KeyConditionExpression=Key(DYNAMO_KEY).eq(str(cc)))
+        items = result.get('Items', [])
+
+        if not items:
+            return response(404, {'error': 'Registro no encontrado'})
+
+        return response(200, items[0])
+
+    except json.JSONDecodeError:
+        return response(400, {'error': 'JSON inválido en el body'})
+    except Exception as e:
+        logger.error(f'Error: {e}')
+        return response(500, {'error': 'Error interno del servidor'})
+
+
+def response(status_code, body):
+    return {
+        'statusCode': status_code,
+        'headers': {'Content-Type': 'application/json'},
+        'body': json.dumps(body, default=str)
+    }
