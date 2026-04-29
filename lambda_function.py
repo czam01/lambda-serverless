@@ -5,6 +5,7 @@ import logging
 from boto3.dynamodb.conditions import Key
 
 # VotaNet - Sistema de consulta de votantes
+# Desplegado via CodePipeline CI/CD
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
