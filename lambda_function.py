@@ -4,8 +4,7 @@ import os
 import logging
 from boto3.dynamodb.conditions import Key
 
-# VotaNet - Sistema de consulta de votantes
-# Desplegado via CodePipeline CI/CD
+# Camilor, John, Filiberto, Andres, Diego, Jessica, Gabriela, kevin como estan hoy a las 7.25 hora de colombia
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
