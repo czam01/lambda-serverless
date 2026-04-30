@@ -4,7 +4,7 @@ import os
 import logging
 from boto3.dynamodb.conditions import Key
 
-# Camilor, John, Filiberto, Andres, Diego, Jessica, Gabriela, kevin como estan hoy a las 7.25 hora de colombia
+# Ahora todo debio quedar automatico, los quiero mucho :)
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
